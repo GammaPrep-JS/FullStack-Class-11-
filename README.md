@@ -1,7 +1,7 @@
-# FullStack-Class-11
-Class 11(Edit Post & Live Search Feature)
+# FullStack-Class-12
+Class 12(Search-backend & Users following each other)
 
-* Codes and pdf for Class 11 is attached here
+* Codes and pdf for Class 12 is attached here
 
 * for linux/mac
 "watch": "nodemon db --ignore frontend-js --ignore public/ & webpack --watch"
