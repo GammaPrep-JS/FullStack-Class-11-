@@ -12,6 +12,15 @@ exports.sharedProfileData = async function(req, res, next) {
 
     req.isVisitorsProfile = isVisitorsProfile
     req.isFollowing = isFollowing
+
+    //retrieve post, follower and following counts
+    let postCount = await Post.countPostsByAuthor(req.profileUser._id)
+    let followerCount = await Follow.countFollowersById(req.profileUser._id)
+    let followingCount = await Follow.countFollowingById(req.profileUser._id)
+
+    req.postCount = postCount
+    req.followerCount = followerCount
+    req.followingCount = followingCount
     next()
 }
 
@@ -67,12 +76,14 @@ exports.ifUserExists = (req, res, next) => {
 exports.profilePostsScreen = (req, res, next) => {
     Post.findByAuthorId(req.profileUser._id).then(posts =>{
         res.render('profile',{
+            currentPage: "posts",
             posts: posts,
             profileUsername: req.profileUser.username,
             profileProfile: req.profileUser.profile,
             profileAvatar: req.profileUser.avatar,
             isVisitorsProfile: req.isVisitorsProfile,
-            isFollowing: req.isFollowing 
+            isFollowing: req.isFollowing,
+            counts: {postCount: req.postCount, followerCount: req.followerCount, followingCount: req.followingCount}
         })
     }).catch(()=>{
         res.render('404')
@@ -84,14 +95,34 @@ exports.profileFollowersScreen = async(req, res, next) => {
         let followers = await Follow.getFollowersById(req.profileUser._id)
 
         res.render('profile-followers',{
+            currentPage: "followers",
             followers: followers,
             profileUsername: req.profileUser.username,
             profileProfile: req.profileUser.profile,
             profileAvatar: req.profileUser.avatar,
             isVisitorsProfile: req.isVisitorsProfile,
-            isFollowing: req.isFollowing 
+            isFollowing: req.isFollowing,
+            counts: {postCount: req.postCount, followerCount: req.followerCount, followingCount: req.followingCount}
         })
     }catch{
         res.render('404')
+    }
+}
+
+exports.profileFollowingScreen = async (req, res)=>{
+    try{
+      let following = await Follow.getFollowingById(req.profileUser._id)
+      res.render('profile-following', {
+          currentPage: "following",
+          following: following,
+          profileUsername: req.profileUser.username,
+          profileAvatar: req.profileUser.avatar,
+          profileProfile: req.profileUser.profile,
+          isFollowing: req.isFollowing,
+          isVisitorsProfile: req.isVisitorsProfile,
+          counts: {postCount: req.postCount, followerCount: req.followerCount, followingCount: req.followingCount}
+      })
+    }catch {
+          res.render('404')
     }
 }
